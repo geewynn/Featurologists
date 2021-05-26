@@ -2,6 +2,7 @@
 setup:
 	pip install -r requirements-dev.txt
 	pre-commit install
+	pip install -e .
 
 .PHONY: lint
 lint: format
