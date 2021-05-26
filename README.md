@@ -12,9 +12,11 @@ source venv/bin/activate
 python -m ipykernel install --user --name=featurologists
 
 # Setup project:
-make setup   # installs package, linters, pre-commit hooks
-make format  # beautifies the staged code
-make test    # runs tests from ./tests/
+make setup    # installs package, linters, pre-commit hooks
+make format   # beautifies the staged code
+make pytest   # runs tests from ./tests/
+make nbtest   # executes notebooks from ./notebooks
+make nbclean  # cleans outputs in notebooks from ./notebooks
 ```
 
 NB: `pre-commit` hooks installed to your system might be very annoying not allowing you to commit your code.

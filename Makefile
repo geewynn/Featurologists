@@ -12,17 +12,17 @@ lint: format
 format:
 	pre-commit run --all-files --show-diff-on-failure
 
-.PHONY: test-py
-test-py:
+.PHONY: pytest
+pytest:
 	pytest tests
 
-.PHONY: test-nb
-test-nb:
+.PHONY: nbtest
+nbtest:
 	find notebooks -name '*.ipynb' -exec jupyter nbconvert --execute --inplace {} \;
 	git status
 
 
-.PHONY: clean-nb
-clean-nb:
+.PHONY: nbclean
+nbclean:
 	find notebooks -name '*.ipynb' -exec nb-clean clean --remove-empty-cells {} \;
 	git status
