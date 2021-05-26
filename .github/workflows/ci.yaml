@@ -29,6 +29,14 @@ jobs:
         restore-keys: |
           pip-lint-
 
+    - name: Cache PyPI
+      uses: actions/cache@v2.1.5
+      with:
+        key: pre-commit-
+        path: ~/.cache/pre-commit
+        restore-keys: |
+          pip-commit-
+
     - name: Install dependencies
       run: |
         python -m pip install -U pip
