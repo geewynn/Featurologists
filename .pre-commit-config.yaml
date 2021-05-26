@@ -1,54 +1,59 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: 'v4.0.1'
-  hooks:
-  - id: check-merge-conflict
-    exclude: "rst$"
-- repo: https://github.com/asottile/yesqa
+# Hooks for python code quality:
+- repo: https://github.com/asottile/yesqa  # auto-remote unnecssary '# noqa'
   rev: v1.2.3
   hooks:
   - id: yesqa
-
-# from: https://zhauniarovich.com/post/2020/2020-06-clearing-jupyter-output
-- repo: local
-  hooks:
-    - id: jupyter-nb-clear-output
-      name: jupyter-nb-clear-output
-      files: \.ipynb$
-      stages: [commit]
-      language: system
-      entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
-
 - repo: https://github.com/pre-commit/mirrors-isort
   rev: 'v5.8.0'
   hooks:
   - id: isort
+    args: ['featurologists']  # [-r, -c]  # uncomment this to check only
 - repo: https://github.com/psf/black
   rev: '21.5b1'
   hooks:
-    - id: black
-      language_version: python3 # Should be a command that runs python3.6+
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: 'v4.0.1'
-  hooks:
-  - id: check-case-conflict
-  - id: check-json
-  - id: check-xml
-  - id: debug-statements
-  - id: check-added-large-files
-  - id: end-of-file-fixer
-    exclude: "^docs/"
-  - id: requirements-txt-fixer
-  - id: trailing-whitespace
-  - id: check-symlinks
-  - id: debug-statements
-- repo: https://github.com/asottile/pyupgrade
-  rev: 'v2.18.2'
-  hooks:
-  - id: pyupgrade
-    args: ['--py36-plus']
+  - id: black
+    language_version: python3
+    # args: [--check]  # uncomment this to check only
 - repo: https://gitlab.com/pycqa/flake8
   rev: '3.9.2'
   hooks:
   - id: flake8
     exclude: "^docs/"
+- repo: https://github.com/asottile/pyupgrade
+  rev: 'v2.18.2'
+  hooks:
+  - id: pyupgrade
+    args: ['--py36-plus']
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: '214c333'
+  hooks:
+  - id: mypy
+# Hooks for jupyter notebooks:
+- repo: https://github.com/nbQA-dev/nbQA
+  rev: 0.9.0
+  hooks:
+    - id: nbqa-isort
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-black
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-flake8
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-pyupgrade
+      args: [--nbqa-mutate, --py36-plus]  # comment this to check only
+    - id: nbqa-mypy
+      args: [--nbqa-mutate]  # comment this to check only
+# Other general hooks:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: 'v4.0.1'
+  hooks:
+  - id: check-added-large-files
+    args: [--maxkb=100700]  # 50 Mb
+  - id: check-case-conflict
+  - id: check-json
+  - id: check-yaml
+  - id: check-added-large-files
+  - id: end-of-file-fixer
+    exclude: "^(docs|notebooks)/"
+  - id: trailing-whitespace
+  - id: check-symlinks
