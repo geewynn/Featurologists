@@ -5,11 +5,7 @@ setup:
 	pip install -e .
 
 .PHONY: lint
-lint: format
-	mypy featurologists tests setup.py
-
-.PHONY: format
-format:
+lint:
 	pre-commit run --all-files --show-diff-on-failure
 
 .PHONY: pytest
