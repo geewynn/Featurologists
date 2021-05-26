@@ -8,6 +8,9 @@ setup:
 lint:
 	pre-commit run --all-files --show-diff-on-failure
 
+.PHONY: test
+test: pytest nbtest
+
 .PHONY: pytest
 pytest:
 	pytest tests
@@ -16,7 +19,6 @@ pytest:
 nbtest:
 	find notebooks -name '*.ipynb' -exec jupyter nbconvert --execute --inplace {} \;
 	git status
-
 
 .PHONY: nbclean
 nbclean:
