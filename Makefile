@@ -1,7 +1,6 @@
 .PHONY: setup
 setup:
 	pip install -r requirements-dev.txt
-	pip install -e .
 	pre-commit install
 
 .PHONY: lint
