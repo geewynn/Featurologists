@@ -14,3 +14,4 @@ format:
 .PHONY: test
 test: lint
 	pytest tests
+	find notebooks -name '*.ipynb' -exec jupyter nbconvert --execute --inplace {} \;

@@ -29,14 +29,6 @@ repos:
   rev: '214c333'
   hooks:
   - id: mypy
-- repo: local
-  hooks:
-    - id: nb-run
-      name: nb-run
-      files: \.ipynb$
-      stages: [commit]
-      language: system
-      entry: jupyter nbconvert --execute
 # Hooks for jupyter notebooks:
 - repo: https://github.com/nbQA-dev/nbQA
   rev: 0.9.0
