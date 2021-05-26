@@ -1,5 +1,8 @@
-# import pickle
+import json
+import pickle
 import random
+from pathlib import Path
+from typing import Dict, Optional, Union
 
 import lightgbm
 import xgboost
@@ -73,7 +76,7 @@ def predict_proba(model, X_test, **kwargs):
     return Y_prob
 
 
-def calc_model_roc_auc(model, X_test, Y_test, **kwargs):
+def calc_score_roc_auc(model, X_test, Y_test, **kwargs):
     Y_prob = predict_proba(model, X_test)
     score = roc_auc_score(
         Y_test,
@@ -82,3 +85,11 @@ def calc_model_roc_auc(model, X_test, Y_test, **kwargs):
         average=kwargs.pop("average", "macro"),
     )
     return score
+
+
+def save_model(model, target_dir: Union[str, Path], metadata: Optional[Dict] = None):
+    target_dir = Path(target_dir)
+    target_dir.mkdir(parents=True)
+    with (target_dir / "model.pkl").open("wb") as f:
+        pickle.dump(model, f)
+    (target_dir / "metadata.json").write_text(json.dumps(metadata, indent=4))

@@ -21,12 +21,12 @@ repos:
   - id: flake8
     exclude: "^docs/"
 - repo: https://github.com/asottile/pyupgrade
-  rev: 'v2.18.2'
+  rev: 'v2.18.3'
   hooks:
   - id: pyupgrade
     args: ['--py36-plus']
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: '214c333'
+  rev: 'v0.812'
   hooks:
   - id: mypy
 # Hooks for jupyter notebooks:
@@ -47,12 +47,9 @@ repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: 'v4.0.1'
   hooks:
-  - id: check-added-large-files
-    args: [--maxkb=100700]  # 50 Mb
   - id: check-case-conflict
   - id: check-json
   - id: check-yaml
-  - id: check-added-large-files
   - id: end-of-file-fixer
     exclude: "^(docs|notebooks)/"
   - id: trailing-whitespace
