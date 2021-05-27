@@ -1,58 +1,47 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "featurologists.fullname" . }}
+  name: {{ include "featurologists.fullname" . }}-jupyter
   labels:
     {{- include "featurologists.labels" . | nindent 4 }}
+    app: jupyter
 spec:
   selector:
     matchLabels:
       {{- include "featurologists.selectorLabels" . | nindent 6 }}
+      app: jupyter
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "featurologists.selectorLabels" . | nindent 8 }}
+        app: jupyter
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "featurologists.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+      {{- define "gitClone.initContainer" -}}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      - name: main
+        image: "{{ .Values.jupyter.image.repository | required }}:{{ .Values.jupyter.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8888
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        resources:
+          {{- toYaml .Values.jupyter.resources | nindent 12 }}
+        command:
+        - bash
+        - -c
+        - >-
+          jupyter {{ .Values.jupyter.mode | required }} \
+              --no-browser \
+              --ip=0.0.0.0 \
+              --port=8888 \
+              --allow-root \
+              --NotebookApp.token= \
+              --notebook-dir=/workdir \
+              --NotebookApp.shutdown_no_activity_timeout=7200 \
+              --MappingKernelManager.cull_idle_timeout=7200

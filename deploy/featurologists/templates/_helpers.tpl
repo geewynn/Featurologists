@@ -60,3 +60,48 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Git repo volume name
+*/}}
+{{- define "gitClone.volumeName" -}}
+git-repo
+{{- end }}
+
+{{/*
+Volumes to clone git repo
+*/}}
+{{- define "gitClone.volumes" -}}
+- name: {{ include "gitClone.volumeName" . }}
+  emptyDir: {}
+- name: ssh-secret-volume
+  secret:
+    secretName: {{ template "ofzinference.fullname" . }}-github
+    items:
+    - key: id_rsa
+      path: id_rsa
+      mode: 0600
+{{- end }}
+
+{{/*
+Init container to clone git repo
+*/}}
+{{- define "gitClone.initContainer" -}}
+- image: alpine/git:1.0.27
+  name: git-clone
+  volumeMounts:
+  - name: {{ include "gitClone.volumeName" . }}
+    mountPath: /tmp/git
+  - name: ssh-secret-volume
+    mountPath: /etc/ssh
+  env:
+  - name: GIT_SSH_COMMAND
+    value: 'ssh -i /etc/ssh/id_rsa -o "StrictHostKeyChecking=no"'
+  command:
+  - git
+  - clone
+  - {{ .Values.git.repo | required }}
+  - -b
+  - {{ .Values.git.branch | required }}
+  - /tmp/git
+{{- end }}
