@@ -48,9 +48,7 @@ repos:
   rev: 'v4.0.1'
   hooks:
   - id: check-case-conflict
-  - id: check-json
-  - id: check-yaml
   - id: end-of-file-fixer
-    exclude: "^(docs|notebooks)/"
+    exclude: "^(docs|notebooks/deploy)/"
   - id: trailing-whitespace
   - id: check-symlinks
