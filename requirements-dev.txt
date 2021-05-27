@@ -1,6 +1,4 @@
-black==21.5b1
-flake8==3.9.2
-flake8-isort==4.0.0
-mypy==0.812
-pre-commit==2.13.0
+jupyter>=1.0.0
+nb-clean>=2.0.2
+pre-commit>=2.13.0
 pytest>=6.2.4
