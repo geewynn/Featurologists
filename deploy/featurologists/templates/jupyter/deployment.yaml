@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "featurologists.fullname" . }}-jupyter
+  name: jupyter
   labels:
     {{- include "featurologists.labels" . | nindent 4 }}
     app: jupyter
@@ -16,32 +16,35 @@ spec:
         {{- include "featurologists.selectorLabels" . | nindent 8 }}
         app: jupyter
     spec:
+      volumes:
+      {{- include "gitClone.volumes" . | nindent 6 }}
       initContainers:
-      {{- define "gitClone.initContainer" -}}
+      {{- include "gitClone.initContainer" . | nindent 6 }}
       containers:
       - name: main
-        image: "{{ .Values.jupyter.image.repository | required }}:{{ .Values.jupyter.image.tag | default .Chart.AppVersion }}"
+        image: {{ required ".Values.jupyter.image.repository is required!" .Values.jupyter.image.repository }}:
+               {{- .Values.jupyter.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: {{ include "gitClone.volumeName" . }}
+          mountPath: /project
+        workingDir: /project
         ports:
         - name: http
           containerPort: 8888
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
         resources:
           {{- toYaml .Values.jupyter.resources | nindent 12 }}
         command:
         - bash
         - -c
         - >-
-          jupyter {{ .Values.jupyter.mode | required }} \
+          cd /project && make setup
+          && jupyter {{ .Values.jupyter.mode }} \
               --no-browser \
               --ip=0.0.0.0 \
               --port=8888 \
               --allow-root \
               --NotebookApp.token= \
-              --notebook-dir=/workdir \
+              --notebook-dir=/project \
               --NotebookApp.shutdown_no_activity_timeout=7200 \
               --MappingKernelManager.cull_idle_timeout=7200

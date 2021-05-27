@@ -13,7 +13,7 @@ python -m ipykernel install --user --name=featurologists
 
 # Setup project:
 make setup    # installs package, linters, pre-commit hooks
-make format   # beautifies the staged code
+make lint     # beautifies the staged code
 make pytest   # runs tests from ./tests/
 make nbtest   # executes notebooks from ./notebooks
 make nbclean  # cleans outputs in notebooks from ./notebooks

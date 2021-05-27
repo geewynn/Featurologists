@@ -1,22 +1,22 @@
 # Default values for featurologists.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-nameOverride: ""
-fullnameOverride: ""
 
 git:
   repo: ~  # $(git remote get-url origin)
   branch: main
+  deployKeySecret:
+    name: # required: pre-existing secret containing your deploy key RSA
+    key: id_rsa
 
 # Our docker registry:
 #   docker-registry.registry-docker-registry:5000
 
 jupyter:
   mode: notebook
+
   image:
     repo: ~
-    tag: ""
+    tag: ~
+
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
