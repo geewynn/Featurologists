@@ -6,18 +6,22 @@ import argparse
 from customer_segmentation_toolkit.data_zoo import download_data_csv
 
 
-columns =['InvoiceNo','StockCode','Description','Quantity','InvoiceDate','UnitPrice','CustomerID','Country']
+def load_data():
+    columns =['InvoiceNo','StockCode','Description','Quantity','InvoiceDate','UnitPrice','CustomerID','Country']
 
-csv = "raw_live_data.csv"
-data = download_data_csv(
-        f"data/output/01_data_split_offline_online/{csv}"
-    )
+    csv = "raw_live_data.csv"
+    data = download_data_csv(
+            f"data/output/01_data_split_offline_online/{csv}"
+        )
+    return columns, data
 
 
 def producer(arg=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--endpoint', help='kafka bootstrap broker')
     known_args, _ = parser.parse_known_args(arg)
+
+    columns, data = load_data()
 
     producer = KafkaProducer(
         bootstrap_servers=[known_args.endpoint],
@@ -31,7 +35,4 @@ def producer(arg=None):
         print(time.sleep(4))
         producer.flush()
 
-
-
-if __name__ == '__main__':
-    producer()
+producer()
