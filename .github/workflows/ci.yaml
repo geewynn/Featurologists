@@ -21,7 +21,7 @@ jobs:
       with:
         python-version: '3.7'
 
-    - name: Cache PyPI
+    - name: Cache pip
       uses: actions/cache@v2.1.5
       with:
         key: pip-lint-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements*.txt') }}
@@ -29,13 +29,13 @@ jobs:
         restore-keys: |
           pip-lint-
 
-    - name: Cache PyPI
+    - name: Cache pre-commit
       uses: actions/cache@v2.1.5
       with:
         key: pre-commit-
         path: ~/.cache/pre-commit
         restore-keys: |
-          pip-commit-
+          pre-commit-
 
     - name: Install dependencies
       run: |
