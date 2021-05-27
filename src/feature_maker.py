@@ -23,7 +23,7 @@ class Latent_Embed(nn.Module):
         return out
 
 
-def feature_maker(data_path='../data/no_live_data.csv'):
+def feature_maker(data_path='../data/data.csv'):
     df = pd.read_csv(data_path, encoding="ISO-8859-1",
                      dtype={'CustomerID': str, 'InvoiceID': str})
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
@@ -86,4 +86,4 @@ def feature_maker(data_path='../data/no_live_data.csv'):
     print("Live Features shape: ", raw_live_data.shape)
 
 
-feature_maker(data_path='../data/no_live_data.csv')
+feature_maker(data_path='../data/data.csv')
