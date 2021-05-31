@@ -70,6 +70,10 @@ helm-test: require-k8s-options
 	helm -n $(K8S_NAMESPACE) test main
 
 
+.PHONY: helm-rollback
+helm-rollback: require.GCP_PROJECT require.K8S_NAMESPACE
+	helm -n $(K8S_NAMESPACE) rollback main 0
+
 .PHONY: helm-uninstall
 helm-uninstall: require.GCP_PROJECT require.K8S_NAMESPACE
 	helm -n $(K8S_NAMESPACE) uninstall main

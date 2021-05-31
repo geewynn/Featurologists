@@ -84,9 +84,10 @@ jobs:
         make build-images
         make push-images
 
-    - name: Cache docker image layers
-      uses: satackey/action-docker-layer-caching@v0.0.11
-      continue-on-error: true
+    # TODO: cache docker layers (action below doesn't work)
+    #- name: Cache docker image layers
+    #  uses: satackey/action-docker-layer-caching@v0.0.11
+    #  continue-on-error: true
 
     - name: Deploy to dev
       env:
@@ -100,5 +101,6 @@ jobs:
         echo "GIT_REV=$GIT_REV"
 
         make install-helm
-        make helm-deploy HELM_COMMAND="upgrade --atomic --wait --timeout=5m"
+        make helm-deploy HELM_COMMAND="upgrade --atomic --wait --timeout=5m" \
+          || { echo "Rolling back helm deployment"; make helm-rollback; false; }
         make helm-test
