@@ -55,8 +55,8 @@ create-git-secret: require-k8s-options require.K8S_GIT_SECRET_NAME require.GIT_R
 		--from-file id_rsa="$(GIT_RSA_PATH)"
 
 
-.PHONY: deploy-featurologists
-deploy-featurologists: require-k8s-options
+.PHONY: helm-deploy
+helm-deploy: require-k8s-options
 	helm -n $(K8S_NAMESPACE) $(HELM_COMMAND) main ./deploy/featurologists \
 		--set git.repo="$(GIT_REPO)" \
 		--set git.revision="$(GIT_REV)" \
@@ -65,13 +65,13 @@ deploy-featurologists: require-k8s-options
 		--set jupyter.image.repository="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
 		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)"
 
-.PHONY: test-featurologists
-test-featurologists: require-k8s-options
+.PHONY: helm-test
+helm-test: require-k8s-options
 	helm -n $(K8S_NAMESPACE) test main
 
 
-.PHONY: uninstall-featurologists
-uninstall-featurologists: require.GCP_PROJECT require.K8S_NAMESPACE
+.PHONY: helm-uninstall
+helm-uninstall: require.GCP_PROJECT require.K8S_NAMESPACE
 	helm -n $(K8S_NAMESPACE) uninstall main
 
 

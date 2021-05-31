@@ -100,8 +100,8 @@ jobs:
         echo "GIT_REPO=$GIT_REPO"
 
         make install-helm
-        make deploy-featurologists HELM_COMMAND="upgrade --atomic --wait"
-        make test-featurologists
+        make helm-deploy HELM_COMMAND="upgrade --atomic --wait"
+        make helm-test
 
 
     # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
