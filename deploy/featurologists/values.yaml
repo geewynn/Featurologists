@@ -3,7 +3,7 @@
 # Common settings to pull the code from GitHub
 git:
   repo: ~  # $(git remote get-url origin)
-  branch: main
+  revision: main
   deployKeySecret:
     name: ~  # required: pre-existing secret containing your deploy key RSA
     key: id_rsa

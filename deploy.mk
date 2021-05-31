@@ -13,10 +13,9 @@ HELM_COMMAND = install
 GIT_RSA_PATH ?=
 
 GIT_REPO ?= $(shell git remote get-url origin)
-GIT_BRANCH ?= $(shell git branch --show-current)
-GIT_COMMIT ?= $(shell git rev-parse --short HEAD)
+GIT_REV ?= $(shell git rev-parse --short HEAD)
 
-COMMON_IMAGE_TAG ?= $(GIT_COMMIT)
+COMMON_IMAGE_TAG ?= $(GIT_REV)
 
 JUPYTER_DEPLOY ?= true
 JUPYTER_IMAGE_NAME ?= featurologists/jupyter
@@ -61,7 +60,7 @@ deploy-featurologists: require.GCP_PROJECT
 	kubectl create ns $(K8S_NAMESPACE) |:
 	helm -n $(K8S_NAMESPACE) $(HELM_COMMAND) main ./deploy/featurologists \
 		--set git.repo="$(GIT_REPO)" \
-		--set git.branch="$(GIT_BRANCH)" \
+		--set git.revision="$(GIT_REV)" \
 		--set git.deployKeySecret.name=$(K8S_GIT_SECRET_NAME) \
 		--set jupyter.deploy="$(JUPYTER_DEPLOY)" \
 		--set jupyter.image.repository="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
