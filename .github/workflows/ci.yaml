@@ -81,6 +81,11 @@ jobs:
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       run: |
+        export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
+        export GIT_REV="${GITHUB_SHA::7}"
+        echo "GIT_REPO=$GIT_REPO"
+        echo "GIT_REV=$GIT_REV"
+
         make build-images
         make push-images
 
@@ -95,12 +100,10 @@ jobs:
         K8S_NAMESPACE: featurologists-dev
       run: |
         export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
-        export GIT_REV="${GITHUB_SHA}"
-
+        export GIT_REV="${GITHUB_SHA::7}"
         echo "GIT_REPO=$GIT_REPO"
         echo "GIT_REV=$GIT_REV"
 
         make install-helm
         make helm-history
-
         make helm-deploy
