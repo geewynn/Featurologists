@@ -65,6 +65,10 @@ deploy-featurologists: require-k8s-options
 		--set jupyter.image.repository="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
 		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)"
 
+.PHONY: test-featurologists
+test-featurologists: require-k8s-options
+	helm -n $(K8S_NAMESPACE) test main
+
 
 .PHONY: uninstall-featurologists
 uninstall-featurologists: require.GCP_PROJECT require.K8S_NAMESPACE
