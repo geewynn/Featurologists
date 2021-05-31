@@ -7,6 +7,7 @@ metadata:
     {{- include "featurologists.labels" . | nindent 4 }}
     app: jupyter
 spec:
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       {{- include "featurologists.selectorLabels" . | nindent 6 }}
@@ -19,8 +20,10 @@ spec:
     spec:
       volumes:
       {{- include "gitClone.volumes" . | nindent 6 }}
+
       initContainers:
       {{- include "gitClone.initContainer" . | nindent 6 }}
+
       containers:
       - name: main
         image: {{ required ".Values.jupyter.image.repository is required!" .Values.jupyter.image.repository }}:
@@ -39,7 +42,8 @@ spec:
         - bash
         - -c
         - >-
-          cd /project && make setup
+          cd /project
+          && make setup
           && jupyter {{ .Values.jupyter.mode }} \
               --no-browser \
               --ip=0.0.0.0 \

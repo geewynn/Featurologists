@@ -58,6 +58,8 @@ Volumes to clone git repo
 Init container to clone git repo
 */}}
 {{- define "gitClone.initContainer" -}}
+# Note: somehow when I try to git-clone and then git-reset in a single container,
+# my 'emptyDir' mountpoint is not an empty dir, thus we do it in 2 containers.
 - image: alpine/git:1.0.27
   name: git-clone
   volumeMounts:
@@ -68,17 +70,23 @@ Init container to clone git repo
   env:
   - name: GIT_SSH_COMMAND
     value: 'ssh -i /etc/ssh/id_rsa -o "StrictHostKeyChecking=no"'
-  - name: GIT_REPO
-    value: {{ required ".Values.git.repo is required!" .Values.git.repo }}
-  - name: GIT_REVISION
-    value: {{ required ".Values.git.revision is required!" .Values.git.revision }}
+  command:
+  - git
+  - clone
+  - {{ required ".Values.git.repo is required!" .Values.git.repo }}
+  - /project
+- image: alpine/git:1.0.27
+  name: git-reset-rev
+  volumeMounts:
+  - name: {{ include "gitClone.volumeName" . }}
+    mountPath: /project
   command:
   - sh
   - -x
   - -c
   - >-
-    true
-    && git clone "${GIT_REPO}" /project
-    && cd /project
-    && git reset --hard "${GIT_REVISION}"
+    cd /project
+    && git status
+    && git log --oneline --graph --decorate --all | tee
+    && git reset --hard "{{ required ".Values.git.revision is required!" .Values.git.revision }}"
 {{- end }}

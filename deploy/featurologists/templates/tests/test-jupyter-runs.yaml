@@ -6,9 +6,10 @@ metadata:
   annotations:
     helm.sh/hook: test-success
 spec:
+  restartPolicy: Never
   containers:
   - name: curl
     image: curlimages/curl:7.77.0
-    args: [http://jupyter]
-  restartPolicy: Never
+    args:
+    - http://jupyter
 {{- end }}
