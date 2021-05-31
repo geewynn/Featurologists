@@ -77,12 +77,6 @@ jobs:
         location: ${{ secrets.GKE_LOCATION }}
         credentials: ${{ secrets.GCP_SERVICEACCOUNT_KEY }}
 
-    - name: Show git tree
-      run: |
-        git status
-        git rev-parse --short HEAD
-        git log --oneline --graph --decorate --all | tee
-
     - name: Build and push images
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
@@ -99,12 +93,9 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-dev
       run: |
-        # Use GitHub via SSH not via HTTPS
-        export GIT_REPO=$(git remote get-url origin)
-        echo "GIT_REPO=$GIT_REPO"
-        if [[ "$GIT_REPO" =~ ^"https://github.com/" ]]; then
-          export GIT_REPO="git@github.com:$(echo $GIT_REPO | sed 's|https://github.com/||g').git"
-        fi
+        export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
+        export GIT_REV="${GITHUB_SHA}"
+
         echo "GIT_REPO=$GIT_REPO"
         echo "GIT_REV=$GIT_REV"
 
