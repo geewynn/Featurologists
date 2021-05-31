@@ -5,7 +5,7 @@ K8S_REGISTRY_PREFIX ?= gcr.io/$(GCP_PROJECT)
 
 HELM_VERSION = v3.6.0
 # HELM_COMMAND = tempate --debug
-HELM_COMMAND = upgrade --install
+HELM_COMMAND = upgrade --atomic --wait --timeout=5m --install
 
 # Create a Deploy Key and save it locally.
 # see https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
