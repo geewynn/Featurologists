@@ -113,5 +113,5 @@ jobs:
         echo "GIT_REV=$GIT_REV"
 
         make install-helm
-        make helm-history
         make helm-deploy
+        make helm-history
