@@ -104,4 +104,3 @@ jobs:
         make helm-history
 
         make helm-deploy
-        make helm-test
