@@ -4,9 +4,8 @@ GCP_PROJECT ?= indigo-union-312214
 K8S_REGISTRY_PREFIX ?= gcr.io/$(GCP_PROJECT)
 
 HELM_VERSION = v3.6.0
-HELM_COMMAND = install
-# HELM_COMMAND = deploy
 # HELM_COMMAND = tempate --debug
+HELM_COMMAND = upgrade --install
 
 # Create a Deploy Key and save it locally.
 # see https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
