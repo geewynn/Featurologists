@@ -57,6 +57,7 @@ jobs:
     name: Deploy on dev
     runs-on: ubuntu-latest
     needs: test
+    steps:
 
     - name: Login to GCR
       uses: docker/login-action@v1
