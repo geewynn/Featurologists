@@ -83,9 +83,14 @@ jobs:
         make build-images
         make push-images
 
+    - name: Cache docker image layers
+      uses: satackey/action-docker-layer-caching@v0.0.11
+      continue-on-error: true
+
     - name: Deploy to dev
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+        K8S_NAMESPACE: featurologists-dev
       run: |
         make install-helm
         make deploy-featurologists HELM_COMMAND="upgrade"

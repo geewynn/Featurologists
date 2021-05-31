@@ -62,17 +62,23 @@ Init container to clone git repo
   name: git-clone
   volumeMounts:
   - name: {{ include "gitClone.volumeName" . }}
-    mountPath: /tmp/git
+    mountPath: /project
   - name: ssh-secret-volume
     mountPath: /etc/ssh
   env:
   - name: GIT_SSH_COMMAND
     value: 'ssh -i /etc/ssh/id_rsa -o "StrictHostKeyChecking=no"'
+  - name: GIT_REPO
+    value: {{ required ".Values.git.repo is required!" .Values.git.repo }}
+  - name: GIT_REVISION
+    value: {{ required ".Values.git.revision is required!" .Values.git.revision }}
   command:
-  - git
-  - clone
-  - {{ required ".Values.git.repo is required!" .Values.git.repo }}
-  - -b
-  - {{ required ".Values.git.branch is required!" .Values.git.branch }}
-  - /tmp/git
+  - sh
+  - -x
+  - -c
+  - >-
+    true
+    && git clone "${GIT_REPO}" /project
+    && cd /project
+    && git reset --hard "${GIT_REVISION}"
 {{- end }}
