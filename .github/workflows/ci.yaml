@@ -77,6 +77,8 @@ jobs:
         credentials: ${{ secrets.GCP_SERVICEACCOUNT_KEY }}
 
     - name: Build and push images
+      env:
+        GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       run: |
         make build-images
         make push-images
@@ -86,6 +88,7 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       run: |
         make install-helm
+        make deploy-featurologists HELM_COMMAND="upgrade"
 
 
     # if: github.event_name == 'push' && github.ref == 'refs/heads/master'

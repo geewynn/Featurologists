@@ -4,9 +4,9 @@ GCP_PROJECT ?= indigo-union-312214
 K8S_REGISTRY_PREFIX ?= gcr.io/$(GCP_PROJECT)
 
 HELM_VERSION = v3.6.0
-HELM_CMD = install
-# HELM_CMD = deploy
-# HELM_CMD = tempate --debug
+HELM_COMMAND = install
+# HELM_COMMAND = deploy
+# HELM_COMMAND = tempate --debug
 
 # Create a Deploy Key and save it locally.
 # see https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
@@ -59,7 +59,7 @@ create-git-secret: require.GCP_PROJECT require.GIT_RSA_PATH
 .PHONY: deploy-featurologists
 deploy-featurologists: require.GCP_PROJECT
 	kubectl create ns $(K8S_NAMESPACE) |:
-	helm -n $(K8S_NAMESPACE) $(HELM_CMD) main ./deploy/featurologists \
+	helm -n $(K8S_NAMESPACE) $(HELM_COMMAND) main ./deploy/featurologists \
 		--set git.repo="$(GIT_REPO)" \
 		--set git.branch="$(GIT_BRANCH)" \
 		--set git.deployKeySecret.name=$(K8S_GIT_SECRET_NAME) \
