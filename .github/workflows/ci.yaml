@@ -57,6 +57,7 @@ jobs:
     name: Deploy on dev
     runs-on: ubuntu-latest
     #needs: test
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
 
     - name: Checkout commit
@@ -92,6 +93,7 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-dev
       run: |
+        # Use GitHub via SSH not via HTTPS
         export GIT_REPO=$(git remote get-url origin)
         echo "GIT_REPO=$GIT_REPO"
         if [[ "$GIT_REPO" =~ ^"https://github.com/" ]]; then
@@ -99,9 +101,8 @@ jobs:
         fi
         echo "GIT_REPO=$GIT_REPO"
 
+        echo "GIT_REV=$GIT_REV"
+
         make install-helm
-        make helm-deploy HELM_COMMAND="upgrade --atomic --wait"
+        make helm-deploy HELM_COMMAND="upgrade --atomic --wait --timeout=300"
         make helm-test
-
-
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
