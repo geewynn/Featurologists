@@ -103,6 +103,5 @@ jobs:
         make install-helm
         make helm-history
 
-        make helm-deploy HELM_COMMAND="upgrade --atomic --wait --timeout=5m" \
-          || { echo "Rolling back helm deployment"; make helm-rollback; false; }
+        make helm-deploy
         make helm-test
