@@ -101,6 +101,9 @@ jobs:
         echo "GIT_REV=$GIT_REV"
 
         make install-helm
+        make helm-status
+        make helm-history
+
         make helm-deploy HELM_COMMAND="upgrade --atomic --wait --timeout=5m" \
           || { echo "Rolling back helm deployment"; make helm-rollback; false; }
         make helm-test
