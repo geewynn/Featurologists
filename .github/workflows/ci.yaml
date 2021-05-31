@@ -55,7 +55,7 @@ jobs:
 
   deploy_dev:
     name: Deploy dev
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -93,7 +93,7 @@ jobs:
         make build-images
         make push-images
 
-    - name: Deploy to dev
+    - name: Deploy
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-dev
@@ -146,7 +146,7 @@ jobs:
         make build-images
         make push-images
 
-    - name: Deploy prod
+    - name: Deploy
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-prod
