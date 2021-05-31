@@ -79,6 +79,7 @@ jobs:
     - name: Build and push images
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+        K8S_NAMESPACE: featurologists-dev
       run: |
         make build-images
         make push-images
