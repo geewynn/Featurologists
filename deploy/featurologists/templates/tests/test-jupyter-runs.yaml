@@ -1,19 +1,16 @@
 {{- if .Values.jupyter.deploy }}
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
   name: jupyter-test
   annotations:
     "helm.sh/hook": test,post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
-  failedJobsHistoryLimit: 1
-  template:
-    spec:
-      restartPolicy: Never
-      containers:
-      - name: curl
-        image: curlimages/curl:7.77.0
-        args:
-        - http://jupyter.{{ .Release.Namespace }}/tree
+  restartPolicy: OnFailure
+  containers:
+  - name: curl
+    image: curlimages/curl:7.77.0
+    args:
+    - http://jupyter.{{ .Release.Namespace }}/tree
 {{- end }}
