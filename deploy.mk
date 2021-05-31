@@ -1,12 +1,29 @@
-K8S_REGISTRY_PREFIX = gcr.io/indigo-union-312214
 
-JUPYTER_IMAGE_NAME = featurologists/jupyter
-JUPYTER_IMAGE_TAG = 0.3
-JUPYTER_IMAGE = $(JUPYTER_IMAGE_NAME):$(JUPYTER_IMAGE_TAG)
+# TODO: move this to GH secrets
+GCP_PROJECT ?= indigo-union-312214
+K8S_REGISTRY_PREFIX ?= gcr.io/$(GCP_PROJECT)
 
-K8S_FEATUROLOGISTS_NS = featurologists
-K8S_FEATUROLOGISTS_GIT_SECRET_NAME = git-secret
-K8S_FEATUROLOGISTS_REVISION = dev
+HELM_VERSION = v3.6.0
+HELM_CMD = install
+# HELM_CMD = deploy
+# HELM_CMD = tempate --debug
+
+# Create a Deploy Key and save it locally.
+# see https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
+GIT_RSA_PATH ?=
+
+GIT_REPO ?= $(shell git remote get-url origin)
+GIT_BRANCH ?= $(shell git branch --show-current)
+GIT_COMMIT ?= $(shell git rev-parse --short HEAD)
+
+COMMON_IMAGE_TAG ?= $(GIT_COMMIT)
+
+JUPYTER_DEPLOY ?= true
+JUPYTER_IMAGE_NAME ?= featurologists/jupyter
+JUPYTER_IMAGE ?= $(JUPYTER_IMAGE_NAME):$(COMMON_IMAGE_TAG)
+
+K8S_NAMESPACE ?= featurologists-dev
+K8S_GIT_SECRET_NAME ?= git-secret
 
 
 .PHONY: auth-docker
@@ -14,41 +31,46 @@ auth-docker:
 	gcloud auth configure-docker
 
 
-.PHONY: build-jupyter
-build-jupyter:
+.PHONY: build-images
+build-images:
+	# build image: jupyter
 	docker build -t $(JUPYTER_IMAGE) -f docker/jupyter.Dockerfile .
 
-.PHONY: push-jupyter
-push-jupyter:
+
+.PHONY: push-images
+push-images: require.GCP_PROJECT
+	# push image: jupyter
 	docker tag $(JUPYTER_IMAGE) $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
 	docker push $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
 
 
-HELM_CMD = install
-# HELM_CMD = tempate --debug
+.PHONY: install-helm
+install-helm:
+	curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash -s -- -v $(HELM_VERSION)
 
-# Create a Deploy Key and save it locally.
-# see https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
-RSA_PATH ?=
 
 .PHONY: create-git-secret
-create-git-secret: require.RSA_PATH
-	kubectl create ns $(K8S_FEATUROLOGISTS_NS) |:
-	kubectl -n $(K8S_FEATUROLOGISTS_NS) create secret generic $(K8S_FEATUROLOGISTS_GIT_SECRET_NAME) \
-		--from-file id_rsa="$(RSA_PATH)"
+create-git-secret: require.GCP_PROJECT require.GIT_RSA_PATH
+	kubectl create ns $(K8S_NAMESPACE) |:
+	kubectl -n $(K8S_NAMESPACE) create secret generic $(K8S_GIT_SECRET_NAME) \
+		--from-file id_rsa="$(GIT_RSA_PATH)"
+
 
 .PHONY: deploy-featurologists
-deploy-featurologists:
-	kubectl create ns $(K8S_FEATUROLOGISTS_NS) |:
-	helm -n $(K8S_FEATUROLOGISTS_NS) $(HELM_CMD) $(K8S_FEATUROLOGISTS_REVISION) deploy/featurologists/ \
-		--set git.repo="$(shell git remote get-url origin)" \
-		--set git.deployKeySecret.name=$(K8S_FEATUROLOGISTS_GIT_SECRET_NAME) \
+deploy-featurologists: require.GCP_PROJECT
+	kubectl create ns $(K8S_NAMESPACE) |:
+	helm -n $(K8S_NAMESPACE) $(HELM_CMD) main ./deploy/featurologists \
+		--set git.repo="$(GIT_REPO)" \
+		--set git.branch="$(GIT_BRANCH)" \
+		--set git.deployKeySecret.name=$(K8S_GIT_SECRET_NAME) \
+		--set jupyter.deploy="$(JUPYTER_DEPLOY)" \
 		--set jupyter.image.repository="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
-		--set jupyter.image.tag="$(JUPYTER_IMAGE_TAG)"
+		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)"
+
 
 .PHONY: uninstall-featurologists
-uninstall-featurologists:
-	helm -n $(K8S_FEATUROLOGISTS_NS) uninstall $(K8S_FEATUROLOGISTS_REVISION)
+uninstall-featurologists: require.GCP_PROJECT
+	helm -n $(K8S_NAMESPACE) uninstall main
 
 
 # --

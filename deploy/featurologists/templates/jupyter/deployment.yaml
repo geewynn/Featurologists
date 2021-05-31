@@ -1,3 +1,4 @@
+{{- if .Values.jupyter.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +24,7 @@ spec:
       containers:
       - name: main
         image: {{ required ".Values.jupyter.image.repository is required!" .Values.jupyter.image.repository }}:
-               {{- .Values.jupyter.image.tag | default .Chart.AppVersion }}
+               {{- required ".Values.jupyter.image.tag is required!" .Values.jupyter.image.tag }}
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: {{ include "gitClone.volumeName" . }}
@@ -48,3 +49,4 @@ spec:
               --notebook-dir=/project \
               --NotebookApp.shutdown_no_activity_timeout=7200 \
               --MappingKernelManager.cull_idle_timeout=7200
+{{- end }}
