@@ -82,7 +82,7 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       run: |
         export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
-        export GIT_REV="${GITHUB_SHA::7}"
+        export GIT_REV="${{ github.sha }}"
         echo "GIT_REPO=$GIT_REPO"
         echo "GIT_REV=$GIT_REV"
 
@@ -100,7 +100,7 @@ jobs:
         K8S_NAMESPACE: featurologists-dev
       run: |
         export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
-        export GIT_REV="${GITHUB_SHA::7}"
+        export GIT_REV="${{ github.sha }}"
         echo "GIT_REPO=$GIT_REPO"
         echo "GIT_REV=$GIT_REV"
 
