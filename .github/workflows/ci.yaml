@@ -92,6 +92,12 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-dev
       run: |
+        # fix "WARNING: Kubernetes configuration file is group/world-readable"
+        ls -a ~/.kube/config
+        chmod o-r ~/.kube/config
+        chmod g-r ~/.kube/config
+        ls -a ~/.kube/config
+
         export GIT_REPO=$(git remote get-url origin)
         echo "GIT_REPO=$GIT_REPO"
         if [[ "$GIT_REPO" =~ ^"https://github.com/" ]]; then
