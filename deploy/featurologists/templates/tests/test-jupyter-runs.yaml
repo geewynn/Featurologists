@@ -1,0 +1,14 @@
+{{- if .Values.jupyter.deploy }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jupyter-test
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: curl
+    image: curlimages/curl:7.77.0
+    args: [http://jupyter]
+  restartPolicy: Never
+{{- end }}
