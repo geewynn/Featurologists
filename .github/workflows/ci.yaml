@@ -59,6 +59,9 @@ jobs:
     needs: test
     steps:
 
+    - name: Checkout commit
+      uses: actions/checkout@v2
+
     - name: Login to GCR
       uses: docker/login-action@v1
       with:
