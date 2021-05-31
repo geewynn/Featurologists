@@ -92,6 +92,13 @@ jobs:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         K8S_NAMESPACE: featurologists-dev
       run: |
+        GIT_URL=$(git remote get-url origin)
+        echo "GIT_URL=$GIT_URL"
+        [[ "$GIT_URL" =~ ^"https://github.com/" ]]; then
+          GIT_URL="git@github.com:$(echo $GIT_URL | sed 's|https://github.com/||g').git"
+        fi
+        echo "GIT_URL=$GIT_URL"
+
         make install-helm
         make deploy-featurologists HELM_COMMAND="upgrade"
 
