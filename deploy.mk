@@ -38,7 +38,7 @@ build-images:
 
 
 .PHONY: push-images
-push-images: require-k8s-options
+push-images: require-gcp-options
 	# push image: jupyter
 	docker tag $(JUPYTER_IMAGE) $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
 	docker push $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
@@ -74,7 +74,8 @@ uninstall-featurologists: require.GCP_PROJECT require.K8S_NAMESPACE
 
 # --
 
-require-k8s-options: require.GCP_PROJECT require.K8S_NAMESPACE
+require-gcp-options: require.GCP_PROJECT
+require-k8s-options: require-gcp-options require.K8S_NAMESPACE
 
 .SILENT: require.%
 require.%:
