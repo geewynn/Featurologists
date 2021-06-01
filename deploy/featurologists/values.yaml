@@ -1,0 +1,23 @@
+# Default values for featurologists.
+
+# Common settings to pull the code from GitHub
+git:
+  repo: ~  # $(git remote get-url origin)
+  revision: main
+  deployKeySecret:
+    name: ~  # required: pre-existing secret containing your deploy key RSA
+    key: id_rsa
+
+jupyter:
+  deploy: false
+  mode: notebook
+  image:
+    repo: ~  # required
+    tag: ~  # required
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi

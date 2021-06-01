@@ -1,0 +1,8 @@
+apiVersion: v2
+name: featurologists
+description: MLOps Engineering Lab 2 "Feature Store for ML" by Team #2.
+
+type: application
+version: 0.0.1
+
+appVersion: "1.16.0"

@@ -24,3 +24,5 @@ nbtest:
 nbclean:
 	find notebooks -name '*.ipynb' -exec nb-clean clean --remove-empty-cells {} \;
 	git status
+
+include deploy.mk

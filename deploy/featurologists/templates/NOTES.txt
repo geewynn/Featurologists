@@ -1,0 +1,9 @@
+Featurologists deployed!
+
+--
+  kubectl -n {{ .Release.Namespace }} get all
+--
+
+# Connect to Jupyter:
+export PORT=$(kubectl -n {{ .Release.Namespace }} get service jupyter -o jsonpath="{.spec.ports[0].port}")
+kubectl --namespace {{ .Release.Namespace }} port-forward service/jupyter 8080:$PORT
