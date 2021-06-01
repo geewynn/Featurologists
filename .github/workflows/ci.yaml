@@ -48,9 +48,13 @@ jobs:
       env:
         CI_LINT_RUN: 1
 
-    - name: Run tests
+    - name: Run Python tests
       run: |
-        make test
+        make pytest
+
+    - name: Run Notebooks tests
+      run: |
+        make nbtest
 
 
   deploy_dev:
