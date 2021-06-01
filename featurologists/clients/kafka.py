@@ -28,7 +28,7 @@ def load_data():
     return data
 
 
-def producer(kafka_endpoint: str, *, n_total: Optional[int] = None, delay_s: int = 4):
+def producer(kafka_endpoint: str, *, num_total: Optional[int] = None, delay_s: int = 4):
     producer = kafka.KafkaProducer(
         bootstrap_servers=[kafka_endpoint],
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
@@ -52,7 +52,7 @@ def producer(kafka_endpoint: str, *, n_total: Optional[int] = None, delay_s: int
             raise
         producer.flush()
 
-        if n_total is not None and i == n_total:
+        if num_total is not None and i == num_total:
             break
 
         logging.info(f"Waiting {delay_s} sec")

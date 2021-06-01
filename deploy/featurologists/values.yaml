@@ -21,3 +21,24 @@ jupyter:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+common:
+  image:
+    repo: python
+    tag: 3.8.3
+
+kafkaclient:
+  deploy: True
+  app:
+    # parameters in the app.py
+    endpoint: ~
+    delay: 4  # in seconds
+    numTotal: ~
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi

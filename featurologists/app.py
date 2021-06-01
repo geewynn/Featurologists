@@ -21,10 +21,12 @@ app.add_typer(feature_app, name="feature")
 
 @client_app.command("run-kafka")
 def client_run_kafka(
-    endpoint: str = typer.Option(...),
-    delay_s: int = typer.Option(4),
-    n_total: Optional[int] = typer.Option(None),
+    endpoint: str = typer.Option(..., help="Kafka broker endpoint"),
+    delay: int = typer.Option(4, help="Delay between messages in seconds"),
+    num_total: Optional[int] = typer.Option(
+        None, help="Number of total messages to send"
+    ),
 ):
     """Run kafka client"""
     typer.echo(f"Running kafka client: endpoint={endpoint}")
-    producer(endpoint, n_total=n_total, delay_s=delay_s)
+    producer(endpoint, num_total=num_total, delay_s=delay)

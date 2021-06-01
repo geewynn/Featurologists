@@ -1,22 +1,21 @@
-{{- if .Values.jupyter.deploy }}
+{{- if .Values.kafkaclient.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jupyter
+  name: kafkaclient
   labels:
     {{- include "featurologists.labels" . | nindent 4 }}
-    app: jupyter
+    app: kafkaclient
 spec:
-  revisionHistoryLimit: 5
   selector:
     matchLabels:
       {{- include "featurologists.selectorLabels" . | nindent 6 }}
-      app: jupyter
+      app: kafkaclient
   template:
     metadata:
       labels:
         {{- include "featurologists.selectorLabels" . | nindent 8 }}
-        app: jupyter
+        app: kafkaclient
     spec:
       volumes:
       {{- include "gitClone.volumes" . | nindent 6 }}
@@ -26,8 +25,8 @@ spec:
 
       containers:
       - name: main
-        image: {{ required ".Values.jupyter.image.repo is required!" .Values.jupyter.image.repo }}:
-               {{- required ".Values.jupyter.image.tag is required!" .Values.jupyter.image.tag }}
+        image: {{ required ".Values.common.image.repo is required!" .Values.common.image.repo }}:
+               {{- required ".Values.common.image.tag is required!" .Values.common.image.tag }}
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: {{ include "gitClone.volumeName" . }}
@@ -37,20 +36,13 @@ spec:
         - name: http
           containerPort: 8888
         resources:
-          {{- toYaml .Values.jupyter.resources | nindent 12 }}
+          {{- toYaml .Values.kafkaclient.resources | nindent 12 }}
         command:
         - bash
         - -c
         - >-
-          cd /project
-          && make setup
-          && jupyter {{ .Values.jupyter.mode }} \
-              --no-browser \
-              --ip=0.0.0.0 \
-              --port=8888 \
-              --allow-root \
-              --NotebookApp.token= \
-              --notebook-dir=/project \
-              --NotebookApp.shutdown_no_activity_timeout=7200 \
-              --MappingKernelManager.cull_idle_timeout=7200
+          featurologists client run-kafka \
+            --endpoint {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }} \
+            --delay {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay }} \
+            --num-total {{ .Values.kafkaclient.app.numTotal | quote }}
 {{- end }}
