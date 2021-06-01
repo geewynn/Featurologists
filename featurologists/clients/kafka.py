@@ -1,56 +1,61 @@
 import json
+import logging
 import time
+from typing import Optional
 
+import kafka
 from customer_segmentation_toolkit.data_zoo import download_data_csv
-from kafka import KafkaProducer  # type: ignore
-from tqdm import tqdm
+
+
+TOPIC_ONLINE_INPUT = "online-input"
 
 
 def load_data():
     csv = "raw_live_data.csv"
     data = download_data_csv(f"data/output/01_data_split_offline_online/{csv}")
-
-    columns = [
-        "InvoiceNo",
-        "StockCode",
-        "Description",
-        "Quantity",
-        "InvoiceDate",
-        "UnitPrice",
-        "CustomerID",
-        "Country",
+    data = data[
+        [
+            "InvoiceNo",
+            "StockCode",
+            "Description",
+            "Quantity",
+            "InvoiceDate",
+            "UnitPrice",
+            "CustomerID",
+            "Country",
+        ]
     ]
-    data = data[columns]
     return data
 
 
-def _iterrows_with_progress(df):
-    yield from tqdm(df.iterrows(), total=df.shape[0])
-
-
-def _iterrows_no_progress(df):
-    yield from df.iterrows()
-
-
-def iterate_data(df, progress: bool = False):
-    if progress:
-        iterrows = _iterrows_with_progress
-    else:
-        iterrows = _iterrows_no_progress
-    for _, row in iterrows(df):
-        yield list(row)
-
-
-def producer(kafka_endpoint: str, progress: bool = False):
-    producer = KafkaProducer(
+def producer(kafka_endpoint: str, *, n_total: Optional[int] = None, delay_s: int = 4):
+    producer = kafka.KafkaProducer(
         bootstrap_servers=[kafka_endpoint],
-        api_version=(0, 10, 0),
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        retries=5,
     )
+
     df = load_data()
-    for row in iterate_data(df, progress=progress):
-        print("sending message")
-        producer.send(topic="messages", value=row)
-        print("message sent, waiting 4s")
-        time.sleep(4)
+    total = df.shape[0]
+
+    topic = TOPIC_ONLINE_INPUT
+    for i, row in enumerate(df.iterrows(), 1):
+        logging.info(f"[{i}/{total}] Sending msg to {topic}")
+        msg = row[1].tolist()
+        future = producer.send(topic=topic, value=msg)
+
+        # Block for 'synchronous' sends
+        try:
+            future.get(timeout=10)
+        except kafka.KafkaError as e:
+            logging.error(f"Could not send message to kafka {topic}: {e}")
+            raise
         producer.flush()
+
+        if n_total is not None and i == n_total:
+            break
+
+        logging.info(f"Waiting {delay_s} sec")
+        time.sleep(delay_s)
+
+    logging.info("[+] Successfully finished")
