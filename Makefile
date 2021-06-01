@@ -1,6 +1,7 @@
 .PHONY: setup
 setup:
 	pip install -r requirements-dev.txt
+	python -m ipykernel install --user --name=featurologists
 	pre-commit install
 	pip install -e .
 
@@ -17,12 +18,10 @@ pytest:
 
 .PHONY: nbtest
 nbtest:
-	find notebooks -name '*.ipynb' -exec jupyter nbconvert --execute --inplace {} \;
-	git status
+	python notebooks/run_tests.py
 
 .PHONY: nbclean
 nbclean:
 	find notebooks -name '*.ipynb' -exec nb-clean clean --remove-empty-cells {} \;
-	git status
 
 include deploy.mk
