@@ -41,8 +41,9 @@ spec:
         - bash
         - -c
         - >-
-          featurologists client run-kafka \
-            --endpoint {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }} \
-            --delay {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay }} \
-            --num-total {{ .Values.kafkaclient.app.numTotal | quote }}
+          make setup
+          && featurologists client run-kafka \
+               --endpoint {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }} \
+               --delay {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay }} \
+               --num-total {{ .Values.kafkaclient.app.numTotal | quote }}
 {{- end }}
