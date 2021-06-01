@@ -35,6 +35,8 @@ spec:
         - {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }}
         - --delay
         - {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay | quote }}
+        {{- if .Values.kafkaclient.app.numTotal }}
         - --num-total
         - {{ .Values.kafkaclient.app.numTotal | quote }}
+        {{- end }}
 {{- end }}

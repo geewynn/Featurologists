@@ -12,7 +12,7 @@ jupyter:
   deploy: false
   mode: notebook
   image:
-    repo: featurologists/jupyter
+    repo: ~  # required
     tag: ~  # required
   resources: {}
     # limits:
@@ -23,7 +23,7 @@ jupyter:
     #   memory: 128Mi
 
 mainImage:
-  repo: featurologists/main
+  repo: ~  # required
   tag: ~  # required
 
 kafkaclient:

@@ -40,8 +40,8 @@ def producer(kafka_endpoint: str, *, num_total: Optional[int] = None, delay_s: i
 
     topic = TOPIC_ONLINE_INPUT
     for i, row in enumerate(df.iterrows(), 1):
-        logging.info(f"[{i}/{total}] Sending msg to {topic}")
         msg = row[1].tolist()
+        logging.info(f"[{i}/{total}] Sending msg to '{topic}': {msg}")
         future = producer.send(topic=topic, value=msg)
 
         # Block for 'synchronous' sends
