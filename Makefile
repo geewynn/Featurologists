@@ -1,6 +1,7 @@
 .PHONY: setup
 setup:
 	pip install -r requirements-dev.txt
+	python -m ipykernel install --user --name=featurologists
 	pre-commit install
 	pip install -e .
 
