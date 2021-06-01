@@ -17,33 +17,24 @@ spec:
         {{- include "featurologists.selectorLabels" . | nindent 8 }}
         app: kafkaclient
     spec:
-      volumes:
-      {{- include "gitClone.volumes" . | nindent 6 }}
-
-      initContainers:
-      {{- include "gitClone.initContainer" . | nindent 6 }}
-
       containers:
       - name: main
-        image: {{ required ".Values.common.image.repo is required!" .Values.common.image.repo }}:
-               {{- required ".Values.common.image.tag is required!" .Values.common.image.tag }}
+        image: {{ required ".Values.mainImage.repo is required!" .Values.mainImage.repo }}:
+               {{- required ".Values.mainImage.tag is required!" .Values.mainImage.tag }}
         imagePullPolicy: IfNotPresent
-        volumeMounts:
-        - name: {{ include "gitClone.volumeName" . }}
-          mountPath: /project
-        workingDir: /project
         ports:
         - name: http
           containerPort: 8888
         resources:
           {{- toYaml .Values.kafkaclient.resources | nindent 12 }}
         command:
-        - bash
-        - -c
-        - >-
-          make setup
-          && featurologists client run-kafka \
-               --endpoint {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }} \
-               --delay {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay }} \
-               --num-total {{ .Values.kafkaclient.app.numTotal | quote }}
+        - featurologists
+        - client
+        - run-kafka
+        - --endpoint
+        - {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }}
+        - --delay
+        - {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay | quote }}
+        - --num-total
+        - {{ .Values.kafkaclient.app.numTotal | quote }}
 {{- end }}

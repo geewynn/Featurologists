@@ -17,11 +17,15 @@ GIT_REV ?= $(shell git rev-parse --short HEAD)
 
 COMMON_IMAGE_TAG ?= $(GIT_REV)
 
-JUPYTER_DEPLOY ?= true
+JUPYTER_DEPLOY ?= false
 JUPYTER_IMAGE_NAME ?= featurologists/jupyter
 JUPYTER_IMAGE ?= $(JUPYTER_IMAGE_NAME):$(COMMON_IMAGE_TAG)
 
-ENV ?= dev
+MAIN_IMAGE_NAME ?= featurologists/main
+MAIN_IMAGE ?= $(JUPYTER_IMAGE_NAME):$(COMMON_IMAGE_TAG)
+
+# dev / prod
+ENV ?=
 
 K8S_NAMESPACE = featurologists-$(ENV)
 K8S_GIT_SECRET ?= git-secret
@@ -37,6 +41,8 @@ auth-docker:
 
 .PHONY: build-images
 build-images:
+	# build image: main
+	docker build -t $(MAIN_IMAGE_NAME) -f docker/main.Dockerfile .
 	# build image: jupyter
 	docker build -t $(JUPYTER_IMAGE) -f docker/jupyter.Dockerfile .
 
@@ -46,7 +52,9 @@ push-images: require-gcp-options
 	# push image: jupyter
 	docker tag $(JUPYTER_IMAGE) $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
 	docker push $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
-
+	# push image: main
+	docker tag $(MAIN_IMAGE_NAME) $(K8S_REGISTRY_PREFIX)/$(MAIN_IMAGE_NAME)
+	docker push $(K8S_REGISTRY_PREFIX)/$(MAIN_IMAGE_NAME)
 
 .PHONY: install-helm
 install-helm:
@@ -66,8 +74,8 @@ helm-deploy: require-k8s-options
 		--set git.repo="$(GIT_REPO)" \
 		--set git.revision="$(GIT_REV)" \
 		--set git.deployKeySecret.name=$(K8S_GIT_SECRET) \
+		--set mainImage.tag="$(COMMON_IMAGE_TAG)" \
 		--set jupyter.deploy="$(JUPYTER_DEPLOY)" \
-		--set jupyter.image.repo="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
 		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)" \
 		--set kafkaclient.app.endpoint="$(K8S_KAFKA_SERVICE).$(K8S_KAFKA_NAMESPACE)" \
 		--set kafkaclient.app.numTotal="$(KAFKACLIENT_NUM_TOTAL)"

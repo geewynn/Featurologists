@@ -96,7 +96,7 @@ jobs:
     - name: Deploy
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-        K8S_NAMESPACE: featurologists-dev
+        ENV: dev
       run: |
         # see https://github.community/t/github-sha-not-the-same-as-the-triggering-commit/18286/3
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
@@ -149,7 +149,7 @@ jobs:
     - name: Deploy
       env:
         GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-        K8S_NAMESPACE: featurologists-prod
+        ENV: prod
       run: |
         export GIT_REPO="git@github.com:${GITHUB_REPOSITORY}.git"
         export GIT_REV="${GITHUB_SHA}"
