@@ -17,14 +17,22 @@ GIT_REV ?= $(shell git rev-parse --short HEAD)
 
 COMMON_IMAGE_TAG ?= $(GIT_REV)
 
-JUPYTER_DEPLOY ?= true
+JUPYTER_DEPLOY ?= false
 JUPYTER_IMAGE_NAME ?= featurologists/jupyter
 JUPYTER_IMAGE ?= $(JUPYTER_IMAGE_NAME):$(COMMON_IMAGE_TAG)
 
-# K8S_NAMESPACE ?= featurologists-dev
-K8S_NAMESPACE ?=
-K8S_GIT_SECRET_NAME ?= git-secret
+MAIN_IMAGE_NAME ?= featurologists/main
+MAIN_IMAGE ?= $(MAIN_IMAGE_NAME):$(COMMON_IMAGE_TAG)
 
+# dev / prod
+ENV ?=
+
+K8S_NAMESPACE = featurologists-$(ENV)
+K8S_GIT_SECRET ?= git-secret
+
+K8S_KAFKA_NAMESPACE ?= feast-$(ENV)
+K8S_KAFKA_SERVICE ?= feast-kafka-headless
+KAFKACLIENT_NUM_TOTAL =
 
 .PHONY: auth-docker
 auth-docker:
@@ -33,6 +41,8 @@ auth-docker:
 
 .PHONY: build-images
 build-images:
+	# build image: main
+	docker build -t $(MAIN_IMAGE) -f docker/main.Dockerfile .
 	# build image: jupyter
 	docker build -t $(JUPYTER_IMAGE) -f docker/jupyter.Dockerfile .
 
@@ -42,7 +52,9 @@ push-images: require-gcp-options
 	# push image: jupyter
 	docker tag $(JUPYTER_IMAGE) $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
 	docker push $(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE)
-
+	# push image: main
+	docker tag $(MAIN_IMAGE) $(K8S_REGISTRY_PREFIX)/$(MAIN_IMAGE)
+	docker push $(K8S_REGISTRY_PREFIX)/$(MAIN_IMAGE)
 
 .PHONY: install-helm
 install-helm:
@@ -50,9 +62,9 @@ install-helm:
 
 
 .PHONY: create-git-secret
-create-git-secret: require-k8s-options require.K8S_GIT_SECRET_NAME require.GIT_RSA_PATH
+create-git-secret: require-k8s-options require.K8S_GIT_SECRET require.GIT_RSA_PATH
 	kubectl create ns $(K8S_NAMESPACE) |:
-	kubectl -n $(K8S_NAMESPACE) create secret generic $(K8S_GIT_SECRET_NAME) \
+	kubectl -n $(K8S_NAMESPACE) create secret generic $(K8S_GIT_SECRET) \
 		--from-file id_rsa="$(GIT_RSA_PATH)"
 
 
@@ -61,10 +73,15 @@ helm-deploy: require-k8s-options
 	helm -n $(K8S_NAMESPACE) $(HELM_COMMAND) $(HELM_RELEASE) ./deploy/featurologists \
 		--set git.repo="$(GIT_REPO)" \
 		--set git.revision="$(GIT_REV)" \
-		--set git.deployKeySecret.name=$(K8S_GIT_SECRET_NAME) \
+		--set git.deployKeySecret.name=$(K8S_GIT_SECRET) \
+		--set mainImage.repo="$(K8S_REGISTRY_PREFIX)/$(MAIN_IMAGE_NAME)" \
+		--set mainImage.tag="$(COMMON_IMAGE_TAG)" \
 		--set jupyter.deploy="$(JUPYTER_DEPLOY)" \
-		--set jupyter.image.repository="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
-		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)"
+		--set jupyter.image.repo="$(K8S_REGISTRY_PREFIX)/$(JUPYTER_IMAGE_NAME)" \
+		--set jupyter.image.tag="$(COMMON_IMAGE_TAG)" \
+		--set kafkaclient.app.endpoint="$(K8S_KAFKA_SERVICE).$(K8S_KAFKA_NAMESPACE)" \
+		--set kafkaclient.app.numTotal="$(KAFKACLIENT_NUM_TOTAL)"
+
 
 .PHONY: helm-test
 helm-test: require-k8s-options
@@ -90,7 +107,9 @@ helm-uninstall: require.GCP_PROJECT require.K8S_NAMESPACE
 # --
 
 require-gcp-options: require.GCP_PROJECT
-require-k8s-options: require-gcp-options require.K8S_NAMESPACE
+
+require-k8s-options: require-gcp-options \
+					 require.ENV
 
 .SILENT: require.%
 require.%:

@@ -1,0 +1,42 @@
+{{- if .Values.kafkaclient.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafkaclient
+  labels:
+    {{- include "featurologists.labels" . | nindent 4 }}
+    app: kafkaclient
+spec:
+  selector:
+    matchLabels:
+      {{- include "featurologists.selectorLabels" . | nindent 6 }}
+      app: kafkaclient
+  template:
+    metadata:
+      labels:
+        {{- include "featurologists.selectorLabels" . | nindent 8 }}
+        app: kafkaclient
+    spec:
+      containers:
+      - name: main
+        image: {{ required ".Values.mainImage.repo is required!" .Values.mainImage.repo }}:
+               {{- required ".Values.mainImage.tag is required!" .Values.mainImage.tag }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8888
+        resources:
+          {{- toYaml .Values.kafkaclient.resources | nindent 12 }}
+        command:
+        - featurologists
+        - client
+        - run-kafka
+        - --endpoint
+        - {{ required ".Values.kafkaclient.app.endpoint is requried!" .Values.kafkaclient.app.endpoint }}
+        - --delay
+        - {{ required ".Values.kafkaclient.app.delay is requried!" .Values.kafkaclient.app.delay | quote }}
+        {{- if .Values.kafkaclient.app.numTotal }}
+        - --num-total
+        - {{ .Values.kafkaclient.app.numTotal | quote }}
+        {{- end }}
+{{- end }}

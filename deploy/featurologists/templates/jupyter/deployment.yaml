@@ -26,7 +26,7 @@ spec:
 
       containers:
       - name: main
-        image: {{ required ".Values.jupyter.image.repository is required!" .Values.jupyter.image.repository }}:
+        image: {{ required ".Values.jupyter.image.repo is required!" .Values.jupyter.image.repo }}:
                {{- required ".Values.jupyter.image.tag is required!" .Values.jupyter.image.tag }}
         imagePullPolicy: IfNotPresent
         volumeMounts:

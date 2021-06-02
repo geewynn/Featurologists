@@ -15,5 +15,10 @@ setup(
         "numpy>=1.20.3",
         "matplotlib>=3.4.2",
         "pandas>=1.2.4",
+        "kafka-python>=2.0.2",
+        "typer>=0.3.2",
     ],
+    entry_points={
+        "console_scripts": ["featurologists=featurologists.app:app"],
+    },
 )
