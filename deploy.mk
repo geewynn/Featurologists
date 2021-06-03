@@ -1,6 +1,6 @@
 
 # TODO: move this to GH secrets
-GCP_PROJECT ?= indigo-union-312214
+GCP_PROJECT ?=
 K8S_REGISTRY_PREFIX ?= gcr.io/$(GCP_PROJECT)
 
 HELM_VERSION = v3.6.0
