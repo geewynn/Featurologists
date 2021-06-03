@@ -31,7 +31,7 @@ K8S_NAMESPACE = featurologists-$(ENV)
 K8S_GIT_SECRET ?= git-secret
 
 K8S_KAFKA_NAMESPACE ?= feast-$(ENV)
-K8S_KAFKA_SERVICE ?= feast-kafka-headless
+K8S_KAFKA_SERVICE ?= feast-release-kafka-headless
 KAFKACLIENT_NUM_TOTAL =
 
 .PHONY: auth-docker
