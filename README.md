@@ -8,15 +8,15 @@ Main repository for the [MLOps Engineering Lab #2](https://github.com/mlopscommu
 python -m venv ./venv
 source venv/bin/activate
 
-# Create a jupyter kernel in current virtualenv for local development:
-python -m ipykernel install --user --name=featurologists
-
 # Setup project:
 make setup    # installs package, linters, pre-commit hooks
 make lint     # beautifies the staged code
 make pytest   # runs tests from ./tests/
 make nbtest   # executes notebooks from ./notebooks
 make nbclean  # cleans outputs in notebooks from ./notebooks
+
+# Run jupyter locally:
+make jupyter
 ```
 
 NB: `pre-commit` hooks installed to your system might be very annoying not allowing you to commit your code.
