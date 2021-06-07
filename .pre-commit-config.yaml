@@ -1,0 +1,54 @@
+repos:
+# Hooks for python code quality:
+- repo: https://github.com/asottile/yesqa  # auto-remote unnecssary '# noqa'
+  rev: v1.2.3
+  hooks:
+  - id: yesqa
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: 'v5.8.0'
+  hooks:
+  - id: isort
+    args: ['featurologists']  # [-r, -c]  # uncomment this to check only
+- repo: https://github.com/psf/black
+  rev: '21.5b1'
+  hooks:
+  - id: black
+    language_version: python3
+    # args: [--check]  # uncomment this to check only
+- repo: https://gitlab.com/pycqa/flake8
+  rev: '3.9.2'
+  hooks:
+  - id: flake8
+    exclude: "^docs/"
+- repo: https://github.com/asottile/pyupgrade
+  rev: 'v2.18.3'
+  hooks:
+  - id: pyupgrade
+    args: ['--py36-plus']
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: 'v0.812'
+  hooks:
+  - id: mypy
+# Hooks for jupyter notebooks:
+- repo: https://github.com/nbQA-dev/nbQA
+  rev: 0.9.0
+  hooks:
+    - id: nbqa-isort
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-black
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-flake8
+      args: [--nbqa-mutate]  # comment this to check only
+    - id: nbqa-pyupgrade
+      args: [--nbqa-mutate, --py36-plus]  # comment this to check only
+    - id: nbqa-mypy
+      args: [--nbqa-mutate]  # comment this to check only
+# Other general hooks:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: 'v4.0.1'
+  hooks:
+  - id: check-case-conflict
+  - id: end-of-file-fixer
+    exclude: "^(docs|notebooks/deploy)/"
+  - id: trailing-whitespace
+  - id: check-symlinks
