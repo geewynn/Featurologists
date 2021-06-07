@@ -1,4 +1,5 @@
 import logging
+import random
 
 import typer
 
@@ -23,6 +24,7 @@ def _setup_logger(level=logging.INFO):
     for handler in logging.root.handlers:
         logging.root.removeHandler(handler)
     logging.basicConfig(level=level)
+
 
 @app.callback()
 def main(verbose: bool = False, seed: int = 42):
