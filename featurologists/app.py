@@ -19,6 +19,22 @@ app.add_typer(model_app, name="model")
 app.add_typer(feature_app, name="feature")
 
 
+def _setup_logger(level=logging.INFO):
+    for handler in logging.root.handlers:
+        logging.root.removeHandler(handler)
+    logging.basicConfig(level=level)
+
+@app.callback()
+def main(verbose: bool = False, seed: int = 42):
+    """
+    Go Featurologists!
+    """
+    level = logging.DEBUG if verbose else logging.INFO
+    _setup_logger(level)
+
+    random.seed(seed)
+
+
 @client_app.command("run-kafka")
 def client_run_kafka(
     endpoint: str = typer.Option(..., help="Kafka broker endpoint"),

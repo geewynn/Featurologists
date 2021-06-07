@@ -4,6 +4,11 @@ setup:
 	python -m ipykernel install --user --name=featurologists
 	pre-commit install
 	pip install -e .
+	python -m ipykernel install --user --name=featurologists
+
+.PHONY: jupyter
+jupyter:
+	jupyter notebook ./notebooks
 
 .PHONY: lint
 lint:

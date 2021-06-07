@@ -29,20 +29,20 @@ repos:
   rev: 'v0.812'
   hooks:
   - id: mypy
-# Hooks for jupyter notebooks:
-- repo: https://github.com/nbQA-dev/nbQA
-  rev: 0.9.0
-  hooks:
-    - id: nbqa-isort
-      args: [--nbqa-mutate]  # comment this to check only
-    - id: nbqa-black
-      args: [--nbqa-mutate]  # comment this to check only
-    - id: nbqa-flake8
-      args: [--nbqa-mutate]  # comment this to check only
-    - id: nbqa-pyupgrade
-      args: [--nbqa-mutate, --py36-plus]  # comment this to check only
-    - id: nbqa-mypy
-      args: [--nbqa-mutate]  # comment this to check only
+# # Hooks for jupyter notebooks:
+# - repo: https://github.com/nbQA-dev/nbQA
+#   rev: 0.9.0
+#   hooks:
+#     - id: nbqa-isort
+#       args: [--nbqa-mutate]  # comment this to check only
+#     - id: nbqa-black
+#       args: [--nbqa-mutate]  # comment this to check only
+#     - id: nbqa-flake8
+#       args: [--nbqa-mutate]  # comment this to check only
+#     - id: nbqa-pyupgrade
+#       args: [--nbqa-mutate, --py36-plus]  # comment this to check only
+#     - id: nbqa-mypy
+#       args: [--nbqa-mutate]  # comment this to check only
 # Other general hooks:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: 'v4.0.1'
