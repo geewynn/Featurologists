@@ -6,34 +6,32 @@ import pandas as pd
 #from featurologists.models.customer_segmentation import load_model, predict_proba
 
 
-consumer = KafkaConsumer(
-    'messes',
-     bootstrap_servers=["localhost:9092"],
-     group_id='group-1',
-     max_poll_records=5,
-     enable_auto_commit=False,
-     value_deserializer=lambda x: loads(x.decode('utf-8')))
+TOPIC_ONLINE_INPUT = "messes"
 
 
 def process(batch_msgs):
     df = pd.DataFrame(batch_msgs)
-    #df = df.values
     return df
 
 def consume_messages():
-    while True:
-        message_batch = consumer.poll()
+    consumer = KafkaConsumer(
+            TOPIC_ONLINE_INPUT,
+            bootstrap_servers=["localhost:9092"],
+            enable_auto_commit=False,
+            value_deserializer=lambda x: loads(x.decode('utf-8')))
 
-        for partition_batch in message_batch.values():
-            for message in partition_batch:
-                # do processing of message
-                message = message.value
-                #print(message)
-                data = process(message)
-                print(data)
+    batch = []
 
-        # commits the latest offsets returned by poll
-        consumer.commit()
+    for message in consumer:
+        if len(batch) >= 10:
+            # atomically store results of processing
+            print([message_value for message_value in batch])
+            batch = []
+
+        # add result of message processing to batch
+        batch.append(message.value)
+
+
 
 if __name__ == '__main__':
     consume_messages()
