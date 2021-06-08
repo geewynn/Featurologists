@@ -5,23 +5,8 @@ from typing import Dict, Optional, Union
 
 import lightgbm
 import xgboost
-from customer_segmentation_toolkit.data_zoo import download_data_csv
 from sklearn import model_selection
 from sklearn.metrics import roc_auc_score
-
-from ..features.customer_segmentation import transform
-
-
-def load_data():
-    no_live_data = download_data_csv(
-        "data/output/01_data_split_offline_online/no_live_data.csv",
-        datetime_columns=["InvoiceDate"],
-    )
-
-    df = transform(no_live_data)
-    # columns: [CustomerID,count,min,max,mean,sum,categ_0,categ_1,categ_2,categ_3,
-    #           categ_4,LastPurchase,FirstPurchase,cluster]
-    return df
 
 
 def train_test_split(df):
