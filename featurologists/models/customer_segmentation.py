@@ -1,29 +1,19 @@
 import json
 import pickle
-import random
 from pathlib import Path
 from typing import Dict, Optional, Union
 
 import lightgbm
 import xgboost
-from customer_segmentation_toolkit.data_zoo import download_data_csv
 from sklearn import model_selection
 from sklearn.metrics import roc_auc_score
 
 
-def load_data(random_seed: int = 42):
-    random.seed(random_seed)
-
-    csv = "no_live_data__cleaned__purchase_clusters__train__customer_clusters.csv"
-    selected_customers = download_data_csv(
-        f"data/output/04_data_analyse_customers/{csv}"
-    )
-    # columns: [CustomerID,count,min,max,mean,sum,categ_0,categ_1,categ_2,categ_3,
-    #           categ_4,LastPurchase,FirstPurchase,cluster]
-
+def train_test_split(df):
     columns = ["mean", "categ_0", "categ_1", "categ_2", "categ_3", "categ_4"]
-    X = selected_customers[columns]
-    Y = selected_customers["cluster"]
+
+    X = df[columns]
+    Y = df["cluster"]
 
     X_train, X_test, Y_train, Y_test = model_selection.train_test_split(
         X,
