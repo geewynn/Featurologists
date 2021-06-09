@@ -17,6 +17,7 @@ setup(
         "pandas>=1.2.4",
         "kafka-python>=2.0.2",
         "typer>=0.3.2",
+        "feast==0.10.7",
     ],
     entry_points={
         "console_scripts": ["featurologists=featurologists.app:app"],

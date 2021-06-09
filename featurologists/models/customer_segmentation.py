@@ -4,14 +4,14 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 import lightgbm
+import numpy as np
 import xgboost
 from sklearn import model_selection
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 
 def train_test_split(df):
     columns = ["mean", "categ_0", "categ_1", "categ_2", "categ_3", "categ_4"]
-
     X = df[columns]
     Y = df["cluster"]
 
@@ -50,10 +50,7 @@ def train_lightgbm(X_train, Y_train, **kwargs):
         "verbosity": -1,
     }
     d_train = lightgbm.Dataset(X_train, label=Y_train)
-    model = lightgbm.train(
-        params,
-        d_train,
-    )
+    model = lightgbm.train(params, d_train)
     return model
 
 
@@ -66,7 +63,16 @@ def predict_proba(model, X_test, **kwargs):
     return Y_prob
 
 
+def calc_score_accuracy(model, X_test, Y_test):
+    Y_prob = predict_proba(model, X_test)
+    Y_pred = np.argmax(Y_prob, 1)
+    score = accuracy_score(Y_test, Y_pred)
+    return score
+
+
 def calc_score_roc_auc(model, X_test, Y_test, **kwargs):
+    # Note: failing with ValueError: Number of classes
+    # in y_true not equal to the number of columns in 'y_score'
     Y_prob = predict_proba(model, X_test)
     score = roc_auc_score(
         Y_test,

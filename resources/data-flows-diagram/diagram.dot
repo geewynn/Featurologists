@@ -23,7 +23,7 @@ subgraph cluster_0 {
 
     offline_raw  [label="offline_raw.csv\n[370931 x 8]"];
     offline_cleaned  [label="offline_cleaned.csv\n[263815 x 10]"];
-    offline_clusters [label="offline_clusters.csv\n[3611 x 14]"];
+    offline_clusters [label="offline_clusters.csv\n[3616 x 14]"];
     t_clean_data_rows [label="clean_data_rows()\n(toolkit)", shape=ellipse, fillcolor=white];
     t_transform [label="build_client_clusters()\n(featurologists)", shape=ellipse, fillcolor=white];
 
