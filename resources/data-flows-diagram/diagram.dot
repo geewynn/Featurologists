@@ -1,4 +1,3 @@
-# rendered via: https://dreampuf.github.io/GraphvizOnline/
 
 digraph G {
 subgraph cluster_0 {
@@ -8,7 +7,7 @@ subgraph cluster_0 {
   edge [lblstyle="below, sloped"];#; fontsize=8; fontname="times bold"; fontcolor=firebrick3];
 
   data_csv [label="data.csv\n[541909 x 8]"];
-  t_split_by_invoice_date [label="toolkit:split_by_invoice_date()", shape=ellipse, fillcolor=white];
+  t_split_by_invoice_date [label="split_by_invoice_date()\n(toolkit)", shape=ellipse, fillcolor=white];
   kafka_input [label="kafka_input\n[1 x 8]", shape=cylinder];
 
   data_csv -> t_split_by_invoice_date -> {offline_raw, online_raw};
@@ -25,8 +24,8 @@ subgraph cluster_0 {
     offline_raw  [label="offline_raw.csv\n[370931 x 8]"];
     offline_cleaned  [label="offline_cleaned.csv\n[263815 x 10]"];
     offline_clusters [label="offline_clusters.csv\n[3611 x 14]"];
-    t_clean_data_rows [label="toolkit:clean_data_rows()", shape=ellipse, fillcolor=white];
-    t_transform [label="featurologists:transform()", shape=ellipse, fillcolor=white];
+    t_clean_data_rows [label="clean_data_rows()\n(toolkit)", shape=ellipse, fillcolor=white];
+    t_transform [label="build_client_clusters()\n(featurologists)", shape=ellipse, fillcolor=white];
 
     offline_raw -> t_clean_data_rows -> offline_cleaned;
     offline_cleaned -> t_transform -> offline_clusters;
@@ -47,10 +46,10 @@ subgraph cluster_0 {
   }
 
   subgraph cluster_3 {
-    label="";
+    label="Customer segmentation";
     penwidth=0;
-    model_inference [shape=box3d, label="model_inference\n(mini-batch)"]
-    model_train [shape=box3d, label="model_training"]
+    model_inference [shape=box3d, label="model inference\n(mini-batch)"]
+    model_train [shape=box3d, label="model training"]
   }
 
   kafka_output [label="kafka_output\n[1 x 8]", shape=cylinder];
