@@ -83,3 +83,11 @@ def save_model(model, target_dir: Union[str, Path], metadata: Optional[Dict] = N
     with (target_dir / "model.pkl").open("wb") as f:
         pickle.dump(model, f)
     (target_dir / "metadata.json").write_text(json.dumps(metadata, indent=4))
+
+
+def load_model(model, target_dir):
+    target_dir = Path(target_dir)
+    #target_dir.mkdir(parents=True)
+    with (target_dir / model).open("rb") as f:
+      model = pickle.load(f)
+    return model
