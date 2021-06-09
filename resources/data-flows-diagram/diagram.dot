@@ -1,0 +1,59 @@
+# rendered via: https://dreampuf.github.io/GraphvizOnline/
+
+digraph G {
+subgraph cluster_0 {
+  label = "Original data\n(2010-12-01 - 2011-12-09)";
+  fontsize=8;
+  node [shape=cylinder; style=filled; fillcolor=gray; fontsize=8];
+  edge [lblstyle="below, sloped"];#; fontsize=8; fontname="times bold"; fontcolor=firebrick3];
+
+  data_csv [label="data.csv\n[541909 x 8]"];
+  t_split_by_invoice_date [label="toolkit:split_by_invoice_date()", shape=ellipse, fillcolor=white];
+  kafka_input [label="kafka_input\n[1 x 8]", shape=cylinder];
+
+  data_csv -> t_split_by_invoice_date -> {offline_raw, online_raw};
+  online_raw -> kafka_input [style=dashed];
+
+  kafka_input -> model_inference;
+
+
+
+  subgraph cluster_1 {
+    label="Offline\n(before 01.10.2011)";
+    color=darkgreen;
+
+    offline_raw  [label="offline_raw.csv\n[370931 x 8]"];
+    offline_cleaned  [label="offline_cleaned.csv\n[263815 x 10]"];
+    offline_clusters [label="offline_clusters.csv\n[3611 x 14]"];
+    t_clean_data_rows [label="toolkit:clean_data_rows()", shape=ellipse, fillcolor=white];
+    t_transform [label="featurologists:transform()", shape=ellipse, fillcolor=white];
+
+    offline_raw -> t_clean_data_rows -> offline_cleaned;
+    offline_cleaned -> t_transform -> offline_clusters;
+  }
+
+  offline_clusters -> model_train;
+
+
+
+
+  subgraph cluster_2 {
+    label="Online\n(after 01.10.2011)";
+    color=dodgerblue4;
+
+    online_raw [label="online_raw.csv\n[170978 x 8]"];
+
+
+  }
+
+  subgraph cluster_3 {
+    label="";
+    penwidth=0;
+    model_inference [shape=box3d, label="model_inference\n(mini-batch)"]
+    model_train [shape=box3d, label="model_training"]
+  }
+
+  kafka_output [label="kafka_output\n[1 x 8]", shape=cylinder];
+  model_inference -> kafka_output;
+}
+}
