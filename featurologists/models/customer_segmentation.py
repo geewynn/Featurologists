@@ -68,6 +68,7 @@ def predict_proba(model, X_test):
 
 def predict(model, no_live_data_batch: pd.DataFrame):  # type: ignore
     X_test = build_client_clusters(no_live_data_batch)
+    # print(f"X_test shape: {X_test.shape}")
     Y_prob = predict_proba(model, X_test)
     Y_pred = np.argmax(Y_prob, 1)
     return Y_pred

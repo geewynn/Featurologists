@@ -36,9 +36,11 @@ def build_client_clusters(no_live_data: pd.DataFrame) -> pd.DataFrame:  # type: 
 
     # Clean bad data entries
     df_cleaned = clean_data_rows(df)
+    # print(f'df_cleaned:\n{df_cleaned}\n\n')
 
     # Analysing purchases
-    list_products = build_product_list(df_cleaned)
+    list_products = build_product_list(df_cleaned, filter_by_number=False)
+    # print(f'list_products:\n{list_products}\n\n')
     matrix = build_keywords_matrix(df_cleaned, list_products, THRESHOLD)
     clusters = compute_purchase_clusters(matrix, N_PURCHASE_CLUSTERS)
 
@@ -55,6 +57,7 @@ def build_client_clusters(no_live_data: pd.DataFrame) -> pd.DataFrame:  # type: 
     )
     matrix = convert_customers_df_to_np(transactions_per_user, N_PURCHASE_CLUSTERS)
     scaled_matrix, pca = analyse_customers_pca(matrix)
+    # print(f'scaled_matrix:\n{scaled_matrix}\n\n')
     clusters_clients = compute_customer_clusters(scaled_matrix, N_CUSTOMER_CLUSTERS)
 
     merged_df = add_customer_clusters_info(transactions_per_user, clusters_clients)
