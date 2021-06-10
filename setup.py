@@ -1,6 +1,10 @@
 from setuptools import find_packages, setup
 
 
+TOOLKIT_BRANCH = (
+    "allow-build-mini-batch"  # Artem Y: I'm currently working in this branch.
+)
+
 setup(
     name="featurologists",
     version="0.0.1",
@@ -8,7 +12,8 @@ setup(
     url="https://github.com/geewynn/Featurologists",
     packages=find_packages(),
     install_requires=[
-        "customer-segmentation-toolkit>=0.0.2",
+        # "customer-segmentation-toolkit>=0.0.2",
+        f"customer-segmentation-toolkit @ https://github.com/artemlops/customer-segmentation-toolkit/archive/{TOOLKIT_BRANCH}.zip",  # noqa
         "xgboost>=1.4.2",
         "lightgbm>=3.2.1",
         "scikit-learn>=0.24.2",
