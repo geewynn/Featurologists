@@ -4,14 +4,17 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 import lightgbm
+import numpy as np
+import pandas as pd
 import xgboost
 from sklearn import model_selection
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+from ..data_transforms import build_client_clusters
 
 
 def train_test_split(df):
     columns = ["mean", "categ_0", "categ_1", "categ_2", "categ_3", "categ_4"]
-
     X = df[columns]
     Y = df["cluster"]
 
@@ -50,14 +53,11 @@ def train_lightgbm(X_train, Y_train, **kwargs):
         "verbosity": -1,
     }
     d_train = lightgbm.Dataset(X_train, label=Y_train)
-    model = lightgbm.train(
-        params,
-        d_train,
-    )
+    model = lightgbm.train(params, d_train)
     return model
 
 
-def predict_proba(model, X_test, **kwargs):
+def predict_proba(model, X_test):
     try:
         Y_prob = model.predict_proba(X_test)
     except AttributeError:
@@ -66,7 +66,23 @@ def predict_proba(model, X_test, **kwargs):
     return Y_prob
 
 
+def predict(model, no_live_data_batch: pd.DataFrame):  # type: ignore
+    X_test = build_client_clusters(no_live_data_batch)
+    # print(f"X_test shape: {X_test.shape}")
+    Y_prob = predict_proba(model, X_test)
+    Y_pred = np.argmax(Y_prob, 1)
+    return Y_pred
+
+
+def calc_score_accuracy(model, X_test, Y_test):
+    Y_pred = predict(model, X_test)
+    score = accuracy_score(Y_test, Y_pred)
+    return score
+
+
 def calc_score_roc_auc(model, X_test, Y_test, **kwargs):
+    # Note: failing with ValueError: Number of classes
+    # in y_true not equal to the number of columns in 'y_score'
     Y_prob = predict_proba(model, X_test)
     score = roc_auc_score(
         Y_test,

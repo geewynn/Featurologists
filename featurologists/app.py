@@ -1,13 +1,10 @@
 import logging
 import random
+from typing import Optional
 
 import typer
 
-from .clients.kafka import producer
-
-
-logging.basicConfig(level=logging.INFO)
-from typing import Optional
+from .kafka_client import producer
 
 
 app = typer.Typer()
