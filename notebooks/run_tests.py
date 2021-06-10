@@ -13,7 +13,7 @@ CURRENT_DIR = Path(__file__).parent
 
 
 def collect_nbs(d: Path):
-    return [Path(p) for p in glob.glob(f"{d}/**/*.ipynb")]
+    return [Path(p) for p in glob.glob(f"{d}/**/*.ipynb", recursive=True)]
 
 
 def process_nb(nb: Path, timeout: int = 600, metadata=None):
@@ -26,11 +26,12 @@ def process_nb(nb: Path, timeout: int = 600, metadata=None):
         os.chdir(nb.parent)
         ep.preprocess(nb_text, metadata)
     finally:
+        logging.info(f"Finished with notebook {nb}")
         os.chdir(old_cwd)
 
 
 def process_all_nbs(d: Path):
-    logging.info(f"Processing all notebooks in {CURRENT_DIR}")
+    logging.info(f"Processing all notebooks in {CURRENT_DIR.absolute()}")
     for nb in collect_nbs(d):
         process_nb(nb)
 
