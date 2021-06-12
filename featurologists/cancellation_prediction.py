@@ -30,16 +30,27 @@ def load_country_encoder(path: Union[Path, str]):
     return encoder
 
 
-def preprocess(offline_cleaned_df: pd.DataFrame, env: LabelEncoder):  # type: ignore
+def preprocess_persistent(offline_cleaned_df: pd.DataFrame, enc: LabelEncoder):  # type: ignore
     # Cleanup: drop or rename bad columns
     df_orig = offline_cleaned_df
 
     df = pd.DataFrame()
 
+    df["InvoiceDate"] = df_orig["InvoiceDate"]
     df["Quantity"] = df_orig["Quantity"]
     df["UnitPrice"] = df_orig["UnitPrice"]
 
-    df["Country"] = env.transform(df_orig["Country"])
+    df["Country"] = enc.transform(df_orig["Country"])
+
+    # target variable: 'IsCancelled'
+    df["IsCancelled"] = (df_orig["QuantityCanceled"] > 0).astype(int)
+
+    return df
+
+
+def preprocess_replace_invoice_date(df_preprocessed: pd.DataFrame):  # type: ignore
+    df_orig = df_preprocessed
+    df = df_preprocessed.copy()
 
     dfdt = pd.to_datetime(df_orig["InvoiceDate"])
     df["InvoiceDate_year"] = dfdt.dt.year
@@ -48,10 +59,7 @@ def preprocess(offline_cleaned_df: pd.DataFrame, env: LabelEncoder):  # type: ig
     df["InvoiceDate_hour"] = dfdt.dt.hour
     df["InvoiceDate_minute"] = dfdt.dt.minute
     df["InvoiceDate_second"] = dfdt.dt.second
-
-    # target variable: 'IsCancelled'
-    df["IsCancelled"] = (df_orig["QuantityCanceled"] > 0).astype(int)
-
+    df = df.drop(columns=["InvoiceDate"])
     return df
 
 
