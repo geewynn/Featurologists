@@ -9,9 +9,11 @@ import sklearn.model_selection
 import xgboost
 from sklearn.preprocessing import LabelEncoder
 
+from .utils import LabelEncoderExt
+
 
 def build_country_encoder(countries: List[str]):
-    enc = LabelEncoder()
+    enc = LabelEncoderExt()
     enc.fit(countries)
     # TODO: save/load
     # numpy.save('classes.npy', le.classes_)
@@ -25,21 +27,30 @@ def save_country_encoder(enc: LabelEncoder, path: Union[Path, str]):  # type: ig
 
 
 def load_country_encoder(path: Union[Path, str]):
-    encoder = LabelEncoder()
-    encoder.classes_ = np.load(path, allow_pickle=True)
-    return encoder
+    return LabelEncoderExt.load(path)
 
 
-def preprocess(offline_cleaned_df: pd.DataFrame, env: LabelEncoder):  # type: ignore
+def preprocess_persistent(df, enc: LabelEncoder, add_target=True):  # type: ignore
     # Cleanup: drop or rename bad columns
-    df_orig = offline_cleaned_df
+    df_orig = df
 
     df = pd.DataFrame()
 
+    df["InvoiceDate"] = pd.to_datetime(df_orig["InvoiceDate"])
     df["Quantity"] = df_orig["Quantity"]
     df["UnitPrice"] = df_orig["UnitPrice"]
 
-    df["Country"] = env.transform(df_orig["Country"])
+    df["Country"] = enc.transform(df_orig["Country"])
+
+    if add_target:
+        df["IsCancelled"] = (df_orig["QuantityCanceled"] > 0).astype(int)
+
+    return df
+
+
+def preprocess_replace_invoice_date(df_preprocessed: pd.DataFrame):  # type: ignore
+    df_orig = df_preprocessed
+    df = df_preprocessed.copy()
 
     dfdt = pd.to_datetime(df_orig["InvoiceDate"])
     df["InvoiceDate_year"] = dfdt.dt.year
@@ -48,10 +59,7 @@ def preprocess(offline_cleaned_df: pd.DataFrame, env: LabelEncoder):  # type: ig
     df["InvoiceDate_hour"] = dfdt.dt.hour
     df["InvoiceDate_minute"] = dfdt.dt.minute
     df["InvoiceDate_second"] = dfdt.dt.second
-
-    # target variable: 'IsCancelled'
-    df["IsCancelled"] = (df_orig["QuantityCanceled"] > 0).astype(int)
-
+    df = df.drop(columns=["InvoiceDate"])
     return df
 
 

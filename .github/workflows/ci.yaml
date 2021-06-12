@@ -58,6 +58,8 @@ jobs:
         make pytest
 
     - name: Run Notebooks tests
+      env:
+        K8S_FEAST_NS: feast-dev
       run: |
         make nbtest
 
