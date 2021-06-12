@@ -1,0 +1,15 @@
+{
+    "score_accuracy": 0.9819475769004795,
+    "score_roc_auc": 0.5260223190364177,
+    "error_mse": 0.018052423099520497,
+    "error_r2": 0.02527494605695002,
+    "confidence_least": 0.5028083324432373,
+    "confidence_most": 0.9999750852584839,
+    "predicted_positive_count": 121,
+    "predicted_negative_count": 105405,
+    "predicted_positive_to_negative_fraction": 0.0011479531331530762,
+    "groundtruth_positive_count": 1992,
+    "groundtruth_negative_count": 103534,
+    "groundtruth_positive_to_negative_fraction": 0.019240056406591072,
+    "predicted_positive_to_groundtruth_negative_fraction": 0.0607429718875502
+}
